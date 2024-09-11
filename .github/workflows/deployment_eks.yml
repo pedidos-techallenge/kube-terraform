@@ -31,7 +31,7 @@ jobs:
       # run the actionlinter, will fail on errors
       - uses: devops-actions/actionlint@v0.1.3
 
-      - run: $ echo "Hi";ls $GITHUB_WORKSPACE;echo "-"
+      - run: echo "Hi";ls $GITHUB_WORKSPACE;echo "-"
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
