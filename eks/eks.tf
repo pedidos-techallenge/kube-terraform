@@ -28,7 +28,7 @@ resource "aws_subnet" "eks_subnet" {
 }
 
 resource "aws_eks_fargate_profile" "fargate_profile" {
-  cluster_name           = "techchallenge-eks-fargate-profile"
+  cluster_name           = "techchallenge-eks-cluster"
   fargate_profile_name   = "fargate-profile"
   pod_execution_role_arn = "arn:aws:iam::117590171476:role/LabRole"
   subnet_ids             = aws_subnet.eks_subnet[*].id
