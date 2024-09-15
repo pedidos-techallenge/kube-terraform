@@ -1,0 +1,28 @@
+name: Destroy Cluster EKS Fargate
+
+# Manual workflow
+on: workflow_dispatch
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{secrets.AWS_SESSION_TOKEN}}
+  AWS_DEFAULT_REGION: 'us-east-1'
+  TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+  
+      - name: setup-terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: terraform-init
+        run: terraform -chdir=./eks init -backend-config="bucket=${TF_STATE_BUCKET}" -backend-config="key=eks.tfstate" -backend-config="region=us-east-1"
+
+      - name: terraform-destroy
+        run: terraform -chdir=./eks destroy -auto-approve
