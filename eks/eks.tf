@@ -1,4 +1,4 @@
-resource "aws_eks_cluster" "techchallenge-eks-cluster" {
+resource "aws_eks_cluster" "techchallenge_eks_cluster" {
   name     = "techchallenge-eks-cluster"
   role_arn = "arn:aws:iam::117590171476:role/LabRole"
   version  = "1.30"
@@ -39,7 +39,7 @@ resource "aws_eks_fargate_profile" "fargate_profile" {
 }
 
 output "eks_cluster_name" {
-  value = aws_eks_cluster.fargate_eks_cluster.name
+  value = aws_eks_cluster.techchallenge_eks_cluster.name
 }
 
 output "fargate_profile_name" {
