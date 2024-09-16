@@ -6,7 +6,7 @@ on: workflow_dispatch
 env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_SESSION_TOKEN: ${{secrets.AWS_SESSION_TOKEN}}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
   AWS_DEFAULT_REGION: 'us-east-1'
   TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
 
@@ -24,5 +24,10 @@ jobs:
       - name: terraform-init
         run: terraform -chdir=./eks init -backend-config="bucket=${TF_STATE_BUCKET}" -backend-config="key=eks.tfstate" -backend-config="region=us-east-1"
 
-      - name: terraform-destroy
+      # Step 1: Destroy Fargate profile first
+      - name: terraform-destroy-fargate
+        run: terraform -chdir=./eks destroy -target=aws_eks_fargate_profile.fargate_profile -auto-approve
+      
+      # Step 2: Destroy the rest of the EKS cluster
+      - name: terraform-destroy-cluster
         run: terraform -chdir=./eks destroy -auto-approve
