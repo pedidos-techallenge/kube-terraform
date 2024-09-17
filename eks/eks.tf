@@ -33,6 +33,9 @@ resource "aws_eks_fargate_profile" "fargate_profile" {
   selector {
     namespace = "default"
   }
+
+  depends_on = [aws_eks_cluster.techchallenge_eks_cluster]
+
 }
 
 resource "aws_security_group" "eks_security_group" {
