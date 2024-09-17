@@ -21,11 +21,11 @@ jobs:
         uses: actions/checkout@v4
       
       - name: setup-terraform
-        uses: hashicorp/setup-terraform@v1    
-
-      # Deploy the EKS with fargate
+        uses: hashicorp/setup-terraform@v1 
+      
+      # Provisioning the EKS with fargate
       - name: terraform-init
-        run: terraform -chdir=./eks init -backend-config="bucket=${TF_STATE_BUCKET}" -backend-config="key=eks.tfstate" -backend-config="region=us-east-1"
+        run: terraform -chdir=./eks init -backend-config="bucket=${TF_STATE_BUCKET}" -backend-config="key=eks.tfstate" -backend-config="region=us-east-1"      
 
       - name: terraform-apply
         run: terraform -chdir=./eks apply -auto-approve

@@ -1,3 +1,18 @@
+### EKS subnets
+# Referencing public subnets
+# data "aws_subnets" "public-subnets" {
+#   filter {
+#     name   = "vpc-id"
+#     values = [data.aws_vpc.techchallenge-vpc.id]
+#   }
+
+#   filter {
+#     name   = "tag:Name"
+#     values = ["*public*"]
+#   }
+# }
+
+
 resource "aws_eks_cluster" "techchallenge_eks_cluster" {
   name     = "techchallenge-eks-cluster"
   role_arn = "arn:aws:iam::117590171476:role/LabRole"
@@ -6,6 +21,17 @@ resource "aws_eks_cluster" "techchallenge_eks_cluster" {
   vpc_config {
     security_group_ids = [aws_security_group.eks_security_group.id]
     subnet_ids         = aws_subnet.eks_subnet[*].id
+  }
+}
+
+resource "aws_eks_fargate_profile" "fargate_profile" {
+  cluster_name           = "techchallenge-eks-cluster"
+  fargate_profile_name   = "fargate-profile"
+  pod_execution_role_arn = "arn:aws:iam::117590171476:role/LabRole"
+  subnet_ids             = aws_subnet.eks_subnet[*].id
+
+  selector {
+    namespace = "default"
   }
 }
 
@@ -25,17 +51,6 @@ resource "aws_subnet" "eks_subnet" {
   cidr_block              = "10.0.${count.index}.0/24"
   availability_zone       = element(["us-east-1a", "us-east-1b"], count.index)
   map_public_ip_on_launch = true
-}
-
-resource "aws_eks_fargate_profile" "fargate_profile" {
-  cluster_name           = "techchallenge-eks-cluster"
-  fargate_profile_name   = "fargate-profile"
-  pod_execution_role_arn = "arn:aws:iam::117590171476:role/LabRole"
-  subnet_ids             = aws_subnet.eks_subnet[*].id
-
-  selector {
-    namespace = "default"
-  }
 }
 
 output "eks_cluster_name" {
