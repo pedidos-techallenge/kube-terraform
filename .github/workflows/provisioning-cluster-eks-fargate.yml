@@ -30,25 +30,26 @@ jobs:
 
       - name: Create S3 Bucket
         run: |
-          aws s3api create-bucket --bucket tf-state-bucket-eks --region us-east-1 --create-bucket-configuration LocationConstraint=us-east-1
-          aws s3api put-bucket-encryption --bucket tf-state-bucket-eks --server-side-encryption-configuration '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'
+          aws s3api create-bucket --bucket tf-state-bucket-eks --region us-east-1
+
+      - name: Attach Bucket Policy
+        run: |
           aws s3api put-bucket-policy --bucket tf-state-bucket-eks --policy '{
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {
-                  "AWS": "arn:aws:iam::117590171476:role/LabRole"
-                },
-                "Action": "s3:*",
-                "Resource": [
-                  "arn:aws:s3:::tf-state-bucket-eks",
-                  "arn:aws:s3:::tf-state-bucket-eks/*"
-                ]
-              }
-            ]
+              "Version": "2012-10-17",
+              "Statement": [
+                  {
+                      "Effect": "Allow",
+                      "Principal": {
+                          "AWS": "arn:aws:iam::117590171476:role/LabRole"
+                      },
+                      "Action": "s3:*",
+                      "Resource": [
+                          "arn:aws:s3:::tf-state-bucket-eks",
+                          "arn:aws:s3:::tf-state-bucket-eks/*"
+                      ]
+                  }
+              ]
           }'
-          aws s3api put-public-access-block --bucket tf-state-bucket-eks --public-access-block-configuration BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
 
   terraform:
     runs-on: ubuntu-latest
