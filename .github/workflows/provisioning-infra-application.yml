@@ -24,7 +24,7 @@ jobs:
     #needs: network # Garante que este job só será executado após o job network
     steps:
       - name: Trigger RDS Terraform Apply
-        uses: actions/github-script@v6
+        uses: actions/github-script@v5
         with:
           script: |
             github.rest.actions.createWorkflowDispatch({
@@ -40,7 +40,7 @@ jobs:
     needs: rds # Garante que este job só será executado após o job rds
     steps:
       - name: Trigger EKS Terraform Apply
-        uses: actions/github-script@v6
+        uses: actions/github-script@v5
         with:
           script: |
             github.rest.actions.createWorkflowDispatch({
