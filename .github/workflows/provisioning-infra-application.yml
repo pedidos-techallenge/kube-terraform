@@ -15,7 +15,7 @@ jobs:
             github.rest.actions.createWorkflowDispatch({
               owner: 'pedidos-techallenge',
               repo: 'database-terraform',
-              workflow_id: 'deploy.yml', # Nome do workflow no repositório de rds
+              workflow_id: 'workflows/deploy.yml', # Nome do workflow no repositório de rds
               ref: 'main'
             })
           debug: true
@@ -31,7 +31,7 @@ jobs:
           script: |
             github.rest.actions.createWorkflowDispatch({
               owner: 'pedidos-techallenge',
-              repo: 'eks-repo',
+              repo: 'workflows/eks-repo',
               workflow_id: 'provisioning-cluster-eks-fargate.yml', # Nome do workflow no repositório de eks
               ref: 'main'
             })
