@@ -18,6 +18,7 @@ jobs:
               workflow_id: 'deploy.yml', # Nome do workflow no repositório de rds
               ref: 'main'
             })
+          debug: true
 
   eks:
     name: Trigger EKS Workflow
@@ -34,3 +35,4 @@ jobs:
               workflow_id: 'provisioning-cluster-eks-fargate.yml', # Nome do workflow no repositório de eks
               ref: 'main'
             })
+          debug: true
