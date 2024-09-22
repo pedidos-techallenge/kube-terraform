@@ -36,7 +36,7 @@ jobs:
           script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: 'pedidos-techallenge',
-              repo: 'workflows/eks-repo',
+              repo: 'eks-repo',
               workflow_id: 'provisioning-cluster-eks-fargate.yml',
               ref: 'main',
               headers: {
