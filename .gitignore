@@ -39,3 +39,4 @@ terraform.rc
 ignore_me/
 *.zip
 python/
+.github/workflows/.secrets
