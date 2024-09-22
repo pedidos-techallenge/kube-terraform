@@ -4,25 +4,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  network:
-    name: Trigger Infra Workflow
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Network Terraform Apply
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.actions.createWorkflowDispatch({
-              owner: 'pedidos-techallenge',
-              repo: 'infra',
-              workflow_id: 'deploy.yml', # Nome do workflow no repositório de network
-              ref: 'main'
-            })
-
   rds:
     name: Trigger RDS Workflow
-    runs-on: ubuntu-latest
-    needs: network # Garante que este job só será executado após o job network
+    runs-on: ubuntu-latest    
     steps:
       - name: Trigger RDS Terraform Apply
         uses: actions/github-script@v6
@@ -38,7 +22,7 @@ jobs:
   eks:
     name: Trigger EKS Workflow
     runs-on: ubuntu-latest
-    needs: rds # Garante que este job só será executado após o job rds
+    needs: rds 
     steps:
       - name: Trigger EKS Terraform Apply
         uses: actions/github-script@v6
