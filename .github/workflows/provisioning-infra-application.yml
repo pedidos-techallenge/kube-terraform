@@ -15,15 +15,12 @@ jobs:
         uses: actions/github-script@v5
         with:
           script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'pedidos-techallenge',
-              repo: 'infra',
-              workflow_id: 'deploy.yaml',
-              ref: 'main'
-              headers: {
-                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
-              }
-            });
+            curl --location 'https://api.github.com/repos/pedidos-techallenge/infra/actions/workflows/deploy.yaml/dispatches' \
+            --header 'Accept: application/vnd.github.v3+json' \
+            --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            --header 'Content-Type: application/json; charset=utf-8' \
+            --data '{"ref":"main"}'
   rds:
     name: Trigger RDS Workflow
     runs-on: ubuntu-latest
@@ -33,15 +30,12 @@ jobs:
         uses: actions/github-script@v5
         with:
           script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'pedidos-techallenge',
-              repo: 'database-terraform',
-              workflow_id: 'deploy.yaml',
-              ref: 'main'
-              headers: {
-                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
-              }
-            });
+            curl --location 'https://api.github.com/repos/pedidos-techallenge/database-terraform/actions/workflows/deploy.yaml/dispatches' \
+            --header 'Accept: application/vnd.github.v3+json' \
+            --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            --header 'Content-Type: application/json; charset=utf-8' \
+            --data '{"ref":"main"}'
 
   eks:
     name: Trigger EKS Workflow
@@ -52,12 +46,9 @@ jobs:
         uses: actions/github-script@v5
         with:
           script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'pedidos-techallenge',
-              repo: 'eks-repo',
-              workflow_id: 'provisioning-cluster-eks-fargate.yml',
-              ref: 'main'
-              headers: {
-                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
-              }
-            });
+            curl --location 'https://api.github.com/repos/pedidos-techallenge/kube-terraform/actions/workflows/deploy.yml/dispatches' \
+            --header 'Accept: application/vnd.github.v3+json' \
+            --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            --header 'Content-Type: application/json; charset=utf-8' \
+            --data '{"ref":"main"}'
