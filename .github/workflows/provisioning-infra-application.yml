@@ -12,30 +12,26 @@ jobs:
     runs-on: ubuntu-latest   
     steps:
       - name: Trigger network Terraform Apply
-        uses: actions/github-script@v5
-        with:
-          script: |
-            curl --location 'https://api.github.com/repos/pedidos-techallenge/infra/actions/workflows/deploy.yaml/dispatches' \
-            --header 'Accept: application/vnd.github.v3+json' \
-            --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-            --header 'X-GitHub-Api-Version: 2022-11-28' \
-            --header 'Content-Type: application/json; charset=utf-8' \
-            --data '{"ref":"main"}'
+        run: |
+          curl --location 'https://api.github.com/repos/pedidos-techallenge/infra/actions/workflows/deploy.yaml/dispatches' \
+          --header 'Accept: application/vnd.github.v3+json' \
+          --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --header 'X-GitHub-Api-Version: 2022-11-28' \
+          --header 'Content-Type: application/json; charset=utf-8' \
+          --data '{"ref":"main"}'
   rds:
     name: Trigger RDS Workflow
     runs-on: ubuntu-latest
     needs: network  
     steps:
       - name: Trigger RDS Terraform Apply
-        uses: actions/github-script@v5
-        with:
-          script: |
-            curl --location 'https://api.github.com/repos/pedidos-techallenge/database-terraform/actions/workflows/deploy.yaml/dispatches' \
-            --header 'Accept: application/vnd.github.v3+json' \
-            --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-            --header 'X-GitHub-Api-Version: 2022-11-28' \
-            --header 'Content-Type: application/json; charset=utf-8' \
-            --data '{"ref":"main"}'
+        run: |
+          curl --location 'https://api.github.com/repos/pedidos-techallenge/database-terraform/actions/workflows/deploy.yaml/dispatches' \
+          --header 'Accept: application/vnd.github.v3+json' \
+          --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --header 'X-GitHub-Api-Version: 2022-11-28' \
+          --header 'Content-Type: application/json; charset=utf-8' \
+          --data '{"ref":"main"}'
 
   eks:
     name: Trigger EKS Workflow
@@ -43,12 +39,10 @@ jobs:
     needs: rds
     steps:
       - name: Trigger EKS Terraform Apply
-        uses: actions/github-script@v5
-        with:
-          script: |
-            curl --location 'https://api.github.com/repos/pedidos-techallenge/kube-terraform/actions/workflows/deploy.yml/dispatches' \
-            --header 'Accept: application/vnd.github.v3+json' \
-            --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
-            --header 'X-GitHub-Api-Version: 2022-11-28' \
-            --header 'Content-Type: application/json; charset=utf-8' \
-            --data '{"ref":"main"}'
+        run: |
+          curl --location 'https://api.github.com/repos/pedidos-techallenge/kube-terraform/actions/workflows/deploy.yml/dispatches' \
+          --header 'Accept: application/vnd.github.v3+json' \
+          --header 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+          --header 'X-GitHub-Api-Version: 2022-11-28' \
+          --header 'Content-Type: application/json; charset=utf-8' \
+          --data '{"ref":"main"}'
