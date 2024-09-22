@@ -12,7 +12,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            github.rest.actions.createWorkflowDispatch({
+            await github.rest.actions.createWorkflowDispatch({
               owner: 'pedidos-techallenge',
               repo: 'database-terraform',
               workflow_id: 'workflows/deploy.yml', # Nome do workflow no repositório de rds
@@ -29,7 +29,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            github.rest.actions.createWorkflowDispatch({
+            await github.rest.actions.createWorkflowDispatch({
               owner: 'pedidos-techallenge',
               repo: 'workflows/eks-repo',
               workflow_id: 'provisioning-cluster-eks-fargate.yml', # Nome do workflow no repositório de eks
