@@ -20,7 +20,7 @@ resource "aws_eks_cluster" "techchallenge_eks_cluster" {
 
   vpc_config {
     security_group_ids = [aws_security_group.eks_security_group.id]
-    subnet_ids         = data.aws_subnets.public-subnets.ids
+    subnet_ids         = data.aws_subnets.public-subnets[*].ids
   }
 }
 
@@ -28,7 +28,7 @@ resource "aws_eks_fargate_profile" "fargate_profile" {
   cluster_name           = "techchallenge-eks-cluster"
   fargate_profile_name   = "fargate-profile"
   pod_execution_role_arn = "arn:aws:iam::117590171476:role/LabRole"
-  subnet_ids             = data.aws_subnets.public-subnets.ids
+  subnet_ids             = data.aws_subnets.public-subnets[*].ids
 
   selector {
     namespace = "default"
