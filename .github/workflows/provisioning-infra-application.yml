@@ -8,7 +8,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
   BUCKET_NAME: ${{ secrets.TF_STATE_BUCKET }}
-  GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+  TOKEN_GITHUB: ${{ secrets.TOKEN_GITHUB }}
 
 jobs:
   create-s3-bucket:
@@ -62,7 +62,7 @@ jobs:
       - name: Trigger Network Terraform Apply
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TOKEN_GITHUB }}
           script: |
             const response = await github.rest.actions.createWorkflowDispatch({
               owner: 'pedidos-techallenge',
@@ -70,7 +70,7 @@ jobs:
               workflow_id: 'deploy.yaml', 
               ref: 'main',
               headers: {
-                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
+                Authorization: `Bearer ${process.env.TOKEN_GITHUB}`
               }
             });
 
@@ -87,7 +87,7 @@ jobs:
       - name: Wait and Check Workflow Status
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TOKEN_GITHUB }}
           script: |
             async function getWorkflowRunStatus() {
               let status = 'in_progress';
@@ -143,7 +143,7 @@ jobs:
       - name: Trigger EKS Terraform Apply
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TOKEN_GITHUB }}
           script: |
             const response = await github.rest.actions.createWorkflowDispatch({
               owner: 'pedidos-techallenge',
@@ -151,7 +151,7 @@ jobs:
               workflow_id: 'provisioning-cluster-eks-fargate.yml',
               ref: 'main',
               headers: {
-                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
+                Authorization: `Bearer ${process.env.TOKEN_GITHUB}`
               }
             });
 
@@ -168,7 +168,7 @@ jobs:
       - name: Wait and Check Workflow Status
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TOKEN_GITHUB }}
           script: |
             async function getWorkflowRunStatus() {
               let status = 'in_progress';
@@ -224,7 +224,7 @@ jobs:
       - name: Trigger RDS Terraform Apply
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TOKEN_GITHUB }}
           script: |
             const response = await github.rest.actions.createWorkflowDispatch({
               owner: 'pedidos-techallenge',
@@ -232,7 +232,7 @@ jobs:
               workflow_id: 'deploy.yaml',
               ref: 'main',
               headers: {
-                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
+                Authorization: `Bearer ${process.env.TOKEN_GITHUB}`
               }
             });
 
@@ -249,7 +249,7 @@ jobs:
       - name: Wait and Check Workflow Status
         uses: actions/github-script@v6
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TOKEN_GITHUB }}
           script: |
             async function getWorkflowRunStatus() {
               let status = 'in_progress';
