@@ -86,7 +86,7 @@ resource "aws_eks_fargate_profile" "fargate_profile" {
     namespace = "default"
   }
 
-  depends_on = [data.aws_vpc.techchallenge-vpc]
+  depends_on = [data.aws_vpc.techchallenge-vpc, aws_eks_cluster.techchallenge_eks_cluster]
 
 }
 
@@ -95,18 +95,6 @@ resource "aws_security_group" "eks_security_group" {
   description = "Controla o acesso ao cluster EKS"
   vpc_id      = data.aws_vpc.techchallenge-vpc.id
 }
-
-# resource "aws_vpc" "eks_vpc" {
-#   cidr_block = "10.0.0.0/16"
-# }
-
-# resource "aws_subnet" "eks_subnet" {
-#   count                   = 2
-#   vpc_id                  = aws_vpc.eks_vpc.id
-#   cidr_block              = "10.0.${count.index}.0/24"
-#   availability_zone       = element(["us-east-1a", "us-east-1b"], count.index)
-#   map_public_ip_on_launch = true
-# }
 
 output "eks_cluster_name" {
   value = data.aws_vpc.techchallenge-vpc.tags.Name
