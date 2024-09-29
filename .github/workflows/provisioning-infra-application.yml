@@ -4,61 +4,251 @@ on:
   workflow_dispatch:
 
 env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+  BUCKET_NAME: ${{ secrets.TF_STATE_BUCKET }}
   GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
 
-jobs:
-  network:
-    name: Trigger Network Workflow
-    runs-on: ubuntu-latest
-    steps:
+jobs:  
+  create-network:
+   name: Trigger Network Workflow
+   runs-on: ubuntu-latest 
+   steps:
       - name: Trigger Network Terraform Apply
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.actions.createWorkflowDispatch({
+            const response = await github.rest.actions.createWorkflowDispatch({
               owner: 'pedidos-techallenge',
               repo: 'infra',
               workflow_id: 'deploy.yaml', 
-              ref: 'main',
+              ref: 'build_orchestrator',
               headers: {
                 Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
               }
             });
 
-  rds:
-    name: Trigger RDS Workflow
-    runs-on: ubuntu-latest
-    needs: network
-    steps:
-      - name: Trigger RDS Terraform Apply
+            console.log('Workflow dispatched, checking status...');
+            return response;
+
+      - name: Wait job starting
+        uses: actions/github-script@v6
+        with:          
+          script: |
+            console.log('Waiting for 30 seconds before checking...');
+            await new Promise(resolve => setTimeout(resolve, 30000)); // wait for 30 seconds
+
+      - name: Wait and Check Workflow Status
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'pedidos-techallenge',
-              repo: 'database-terraform',
-              workflow_id: 'deploy.yaml',
-              ref: 'main',
-              headers: {
-                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
-              }
-            });
+            async function getWorkflowRunStatus() {
+              let status = 'in_progress';
+              let runId = null;
+              let attempt = 0;
 
-  eks:
+              while (status === 'in_progress' && attempt < 40) {
+                const runs = await github.rest.actions.listWorkflowRuns({
+                  owner: 'pedidos-techallenge',
+                  repo: 'infra',
+                  workflow_id: 'deploy.yaml',
+                  branch: 'build_orchestrator',
+                });
+
+                if (runs.data.workflow_runs.length > 0) {
+                  runId = runs.data.workflow_runs[0].id;
+                  status = runs.data.workflow_runs[0].status;
+                  console.log(`Workflow status: ${status}`);
+                }
+
+                if (status === 'in_progress') {
+                  console.log('Waiting for 30 seconds before checking again...');
+                  await new Promise(resolve => setTimeout(resolve, 30000)); // wait for 30 seconds
+                }
+
+                attempt++;
+              }
+
+              if (runId && status !== 'completed') {
+                throw new Error(`Workflow run did not complete within the timeout period. Status: ${status}`);
+              }
+
+              const result = await github.rest.actions.getWorkflowRun({
+                owner: 'pedidos-techallenge',
+                repo: 'infra',                
+                run_id: runId,
+              });
+
+              if (result.data.conclusion !== 'success') {
+                throw new Error(`Workflow failed with conclusion: ${result.data.conclusion}`);
+              }
+
+              console.log('Workflow completed successfully.');
+            }
+
+            await getWorkflowRunStatus();
+
+  create-eks:
     name: Trigger EKS Workflow
     runs-on: ubuntu-latest
-    needs: rds 
+    needs: create-network 
     steps:
       - name: Trigger EKS Terraform Apply
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            await github.rest.actions.createWorkflowDispatch({
+            const response = await github.rest.actions.createWorkflowDispatch({
               owner: 'pedidos-techallenge',
               repo: 'kube-terraform',
               workflow_id: 'provisioning-cluster-eks-fargate.yml',
-              ref: 'main',
+              ref: 'new-workflow',
               headers: {
                 Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
               }
             });
+
+            console.log('Workflow dispatched, checking status...');
+            return response;
+      
+      - name: Wait job starting
+        uses: actions/github-script@v6
+        with:          
+          script: |
+            console.log('Waiting for 30 seconds before checking...');
+            await new Promise(resolve => setTimeout(resolve, 30000)); // wait for 30 seconds
+
+      - name: Wait and Check Workflow Status
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            async function getWorkflowRunStatus() {
+              let status = 'in_progress';
+              let runId = null;
+              let attempt = 0;
+
+              while (status === 'in_progress' && attempt < 40) {
+                const runs = await github.rest.actions.listWorkflowRuns({
+                  owner: 'pedidos-techallenge',
+                  repo: 'kube-terraform',
+                  workflow_id: 'provisioning-cluster-eks-fargate.yml',
+                  branch: 'new-workflow',
+                });
+
+                if (runs.data.workflow_runs.length > 0) {
+                  runId = runs.data.workflow_runs[0].id;
+                  status = runs.data.workflow_runs[0].status;
+                  console.log(`Workflow status: ${status}`);
+                }
+
+                if (status === 'in_progress') {
+                  console.log('Waiting for 30 seconds before checking again...');
+                  await new Promise(resolve => setTimeout(resolve, 30000)); // wait for 30 seconds
+                }
+
+                attempt++;
+              }
+
+              if (runId && status !== 'completed') {
+                throw new Error(`Workflow run did not complete within the timeout period. Status: ${status}`);
+              }
+
+              const result = await github.rest.actions.getWorkflowRun({
+                owner: 'pedidos-techallenge',
+                repo: 'kube-terraform',                
+                run_id: runId,
+              });
+
+              if (result.data.conclusion !== 'success') {
+                throw new Error(`Workflow failed with conclusion: ${result.data.conclusion}`);
+              }
+
+              console.log('Workflow completed successfully.');
+            }
+
+            await getWorkflowRunStatus();
+
+  create-rds:
+    name: Trigger RDS Workflow
+    runs-on: ubuntu-latest
+    needs: create-eks
+    steps:
+      - name: Trigger RDS Terraform Apply
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const response = await github.rest.actions.createWorkflowDispatch({
+              owner: 'pedidos-techallenge',
+              repo: 'database-terraform',
+              workflow_id: 'deploy.yaml',
+              ref: 'build_orchestrator',
+              headers: {
+                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
+              }
+            });
+
+            console.log('Workflow dispatched, checking status...');
+            return response;
+
+      - name: Wait job starting
+        uses: actions/github-script@v6
+        with:          
+          script: |
+            console.log('Waiting for 30 seconds before checking...');
+            await new Promise(resolve => setTimeout(resolve, 30000)); // wait for 30 seconds
+
+      - name: Wait and Check Workflow Status
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            async function getWorkflowRunStatus() {
+              let status = 'in_progress';
+              let runId = null;
+              let attempt = 0;
+
+              while (status === 'in_progress' && attempt < 20) {
+                const runs = await github.rest.actions.listWorkflowRuns({
+                  owner: 'pedidos-techallenge',
+                  repo: 'database-terraform',
+                  workflow_id: 'deploy.yaml',
+                  branch: 'build_orchestrator',
+                });
+
+                if (runs.data.workflow_runs.length > 0) {
+                  runId = runs.data.workflow_runs[0].id;
+                  status = runs.data.workflow_runs[0].status;
+                  console.log(`Workflow status: ${status}`);
+                }
+
+                if (status === 'in_progress') {
+                  console.log('Waiting for 30 seconds before checking again...');
+                  await new Promise(resolve => setTimeout(resolve, 30000)); // wait for 30 seconds
+                }
+
+                attempt++;
+              }
+
+              if (runId && status !== 'completed') {
+                throw new Error(`Workflow run did not complete within the timeout period. Status: ${status}`);
+              }
+
+              const result = await github.rest.actions.getWorkflowRun({
+                owner: 'pedidos-techallenge',
+                repo: 'database-terraform',               
+                run_id: runId,                
+              });
+
+              if (result.data.conclusion !== 'success') {
+                throw new Error(`Workflow failed with conclusion: ${result.data.conclusion}`);
+              }
+
+              console.log('Workflow completed successfully.');
+            }
+
+            await getWorkflowRunStatus();
