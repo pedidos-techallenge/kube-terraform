@@ -24,7 +24,7 @@ jobs:
               owner: 'pedidos-techallenge',
               repo: 'infra',
               workflow_id: 'deploy.yaml', 
-              ref: 'build_orchestrator',
+              ref: 'main',
               headers: {
                 Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
               }
@@ -55,7 +55,7 @@ jobs:
                   owner: 'pedidos-techallenge',
                   repo: 'infra',
                   workflow_id: 'deploy.yaml',
-                  branch: 'build_orchestrator',
+                  branch: 'main',
                 });
 
                 if (runs.data.workflow_runs.length > 0) {
@@ -105,7 +105,7 @@ jobs:
               owner: 'pedidos-techallenge',
               repo: 'kube-terraform',
               workflow_id: 'provisioning-cluster-eks-fargate.yml',
-              ref: 'new-workflow',
+              ref: 'main',
               headers: {
                 Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
               }
@@ -136,7 +136,7 @@ jobs:
                   owner: 'pedidos-techallenge',
                   repo: 'kube-terraform',
                   workflow_id: 'provisioning-cluster-eks-fargate.yml',
-                  branch: 'new-workflow',
+                  branch: 'main',
                 });
 
                 if (runs.data.workflow_runs.length > 0) {
@@ -186,7 +186,7 @@ jobs:
               owner: 'pedidos-techallenge',
               repo: 'database-terraform',
               workflow_id: 'deploy.yaml',
-              ref: 'build_orchestrator',
+              ref: 'main',
               headers: {
                 Authorization: `Bearer ${process.env.GITHUB_TOKEN}`
               }
@@ -217,7 +217,7 @@ jobs:
                   owner: 'pedidos-techallenge',
                   repo: 'database-terraform',
                   workflow_id: 'deploy.yaml',
-                  branch: 'build_orchestrator',
+                  branch: 'main',
                 });
 
                 if (runs.data.workflow_runs.length > 0) {
