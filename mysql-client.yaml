@@ -1,31 +1,31 @@
-apiVersion: v1
-kind: Pod
-metadata:
-  name: mysql-client
-  namespace: default
-  labels:
-    app: mysql-client
-spec:
-  containers:
-  - name: mysql-client
-    image: mysql:5.7
-    command: ["sleep", "3600"]
-    resources:
-      requests:
-        memory: "512Mi"  # Requisição de memória (RAM)
-        cpu: "0.5"       # Requisição de CPU (vCPU)
-      limits:
-        memory: "1Gi"    # Limite de memória (RAM)
-        cpu: "1"         # Limite de CPU (vCPU)
-    env:
-    - name: MYSQL_HOST
-      value: "techchallenge-rds.cthz8qd3vyef.us-east-1.rds.amazonaws.com"
-    - name: MYSQL_PORT
-      value: "3306"
-    - name: MYSQL_USER
-      value: "turmafiap"
-    - name: MYSQL_PASSWORD
-      value: "VGVjaEBDaGFsbGFuZ2Uj"
-    - name: MYSQL_DATABASE
-      value: "dbtechchallange"
-  restartPolicy: Always
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: mysql-client
+#   namespace: default
+#   labels:
+#     app: mysql-client
+# spec:
+#   containers:
+#   - name: mysql-client
+#     image: mysql:5.7
+#     command: ["sleep", "3600"]
+#     resources:
+#       requests:
+#         memory: "512Mi"  # Requisição de memória (RAM)
+#         cpu: "0.5"       # Requisição de CPU (vCPU)
+#       limits:
+#         memory: "1Gi"    # Limite de memória (RAM)
+#         cpu: "1"         # Limite de CPU (vCPU)
+#     env:
+#     - name: MYSQL_HOST
+#       value: "techchallenge-rds.cthz8qd3vyef.us-east-1.rds.amazonaws.com"
+#     - name: MYSQL_PORT
+#       value: "3306"
+#     - name: MYSQL_USER
+#       value: "turmafiap"
+#     - name: MYSQL_PASSWORD
+#       value: "VGVjaEBDaGFsbGFuZ2Uj"
+#     - name: MYSQL_DATABASE
+#       value: "dbtechchallange"
+#   restartPolicy: Always
