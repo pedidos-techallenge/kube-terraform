@@ -30,19 +30,20 @@ resource "aws_eks_cluster" "techchallenge_eks_cluster" {
   }
 }
 
-
-resource "aws_eks_fargate_profile" "fargate_profile" {  
-  cluster_name           = "techchallenge-eks-cluster"
-  fargate_profile_name   = "fargate-profile"
-  pod_execution_role_arn = "arn:aws:iam::117590171476:role/LabRole"
-  subnet_ids             = data.aws_subnets.private.ids    
-
-  selector {
-    namespace = "default"
+resource "aws_eks_node_group" "techchallenge_eks_node_group" {
+  cluster_name    = aws_eks_cluster.techchallenge_eks_cluster.name
+  node_group_name = "techchallenge-node-group"
+  node_role_arn   = "arn:aws:iam::117590171476:role/LabRole"  # Substitua pelo ARN correto do papel dos nós
+  subnet_ids      = data.aws_subnets.private.ids
+  scaling_config {
+    desired_size = 1
+    max_size     = 2
+    min_size     = 1
   }
 
-  depends_on = [data.aws_vpc.techchallenge-vpc, aws_eks_cluster.techchallenge_eks_cluster]
+  instance_types = ["t3.medium"]
 
+  depends_on = [aws_eks_cluster.techchallenge_eks_cluster]
 }
 
 resource "aws_security_group" "eks_security_group" {
