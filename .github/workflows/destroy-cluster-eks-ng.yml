@@ -1,0 +1,45 @@
+name: Destroy Cluster EKS With Node groups
+
+on: 
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+  AWS_DEFAULT_REGION: 'us-east-1'
+  TF_STATE_BUCKET: ${{secrets.TF_STATE_BUCKET}}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  destroy-eks:
+    runs-on: ubuntu-latest    
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: setup-terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: "1.6.0"
+      
+      - name: Fix Terraform permissions
+        run: |
+          chmod +x $TERRAFORM_CLI_PATH/terraform
+          chmod +x $TERRAFORM_CLI_PATH/terraform-bin
+      
+      - name: terraform-init
+        run: |
+          $TERRAFORM_CLI_PATH/terraform-bin -chdir=./eks init \
+            -backend-config="bucket=${TF_STATE_BUCKET}" \
+            -backend-config="key=eks.tfstate" \
+            -backend-config="region=us-east-1"
+
+      - name: terraform-destroy
+        run: $TERRAFORM_CLI_PATH/terraform-bin -chdir=./eks destroy -auto-approve
