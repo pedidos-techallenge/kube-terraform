@@ -23,7 +23,7 @@ data "aws_subnets" "private-subnets" {
 
 
 resource "aws_security_group" "eks_security_group" {
-  name        = "eks-security-group"
+  name        = "eks-security-group-order"
   vpc_id = data.aws_vpc.techchallenge-vpc.id
 }
 
